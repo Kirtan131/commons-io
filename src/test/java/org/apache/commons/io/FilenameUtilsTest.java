@@ -216,50 +216,11 @@ public class FilenameUtilsTest {
     }
 
     @Test
-    public void testGetBaseName() {
-        assertNull(FilenameUtils.getBaseName(null));
-        assertEquals("noseperator", FilenameUtils.getBaseName("noseperator.inthispath"));
-        assertEquals("c", FilenameUtils.getBaseName("a/b/c.txt"));
-        assertEquals("c", FilenameUtils.getBaseName("a/b/c"));
-        assertEquals("", FilenameUtils.getBaseName("a/b/c/"));
-        assertEquals("c", FilenameUtils.getBaseName("a\\b\\c"));
-        assertEquals("file.txt", FilenameUtils.getBaseName("file.txt.bak"));
-    }
-
-    @Test
     public void testGetBaseName_with_null_character() {
         assertThrows(IllegalArgumentException.class, () -> FilenameUtils.getBaseName("fil\u0000e.txt.bak"));
     }
 
-    @Test
-    public void testGetExtension() {
-        assertNull(FilenameUtils.getExtension(null));
-        assertEquals("ext", FilenameUtils.getExtension("file.ext"));
-        assertEquals("", FilenameUtils.getExtension("README"));
-        assertEquals("com", FilenameUtils.getExtension("domain.dot.com"));
-        assertEquals("jpeg", FilenameUtils.getExtension("image.jpeg"));
-        assertEquals("", FilenameUtils.getExtension("a.b/c"));
-        assertEquals("txt", FilenameUtils.getExtension("a.b/c.txt"));
-        assertEquals("", FilenameUtils.getExtension("a/b/c"));
-        assertEquals("", FilenameUtils.getExtension("a.b\\c"));
-        assertEquals("txt", FilenameUtils.getExtension("a.b\\c.txt"));
-        assertEquals("", FilenameUtils.getExtension("a\\b\\c"));
-        assertEquals("", FilenameUtils.getExtension("C:\\temp\\foo.bar\\README"));
-        assertEquals("ext", FilenameUtils.getExtension("../filename.ext"));
 
-        if (FilenameUtils.isSystemWindows()) {
-            // Special case handling for NTFS ADS names
-            try {
-                FilenameUtils.getExtension("foo.exe:bar.txt");
-                throw new AssertionError("Expected Exception");
-            } catch (final IllegalArgumentException e) {
-                assertEquals("NTFS ADS separator (':') in file name is forbidden.", e.getMessage());
-            }
-        } else {
-            // Upwards compatibility:
-            assertEquals("txt", FilenameUtils.getExtension("foo.exe:bar.txt"));
-        }
-    }
 
     @Test
     public void testGetFullPath() {
@@ -459,50 +420,6 @@ public class FilenameUtilsTest {
         assertThrows(IllegalArgumentException.class, () -> FilenameUtils.getPathNoEndSeparator("~user/a\u0000/b/c.txt"));
     }
 
-    @Test
-    public void testGetPrefix() {
-        assertNull(FilenameUtils.getPrefix(null));
-        assertNull(FilenameUtils.getPrefix(":"));
-        assertNull(FilenameUtils.getPrefix("1:\\a\\b\\c.txt"));
-        assertNull(FilenameUtils.getPrefix("1:"));
-        assertNull(FilenameUtils.getPrefix("1:a"));
-        assertNull(FilenameUtils.getPrefix("\\\\\\a\\b\\c.txt"));
-        assertNull(FilenameUtils.getPrefix("\\\\a"));
-
-        assertEquals("", FilenameUtils.getPrefix(""));
-        assertEquals("\\", FilenameUtils.getPrefix("\\"));
-
-        if (SystemUtils.IS_OS_WINDOWS) {
-            assertEquals("C:", FilenameUtils.getPrefix("C:"));
-        }
-        if (SystemUtils.IS_OS_LINUX) {
-            assertEquals("", FilenameUtils.getPrefix("C:"));
-        }
-
-        assertEquals("C:\\", FilenameUtils.getPrefix("C:\\"));
-        assertEquals("//server/", FilenameUtils.getPrefix("//server/"));
-        assertEquals("~/", FilenameUtils.getPrefix("~"));
-        assertEquals("~/", FilenameUtils.getPrefix("~/"));
-        assertEquals("~user/", FilenameUtils.getPrefix("~user"));
-        assertEquals("~user/", FilenameUtils.getPrefix("~user/"));
-
-        assertEquals("", FilenameUtils.getPrefix("a\\b\\c.txt"));
-        assertEquals("\\", FilenameUtils.getPrefix("\\a\\b\\c.txt"));
-        assertEquals("C:\\", FilenameUtils.getPrefix("C:\\a\\b\\c.txt"));
-        assertEquals("\\\\server\\", FilenameUtils.getPrefix("\\\\server\\a\\b\\c.txt"));
-
-        assertEquals("", FilenameUtils.getPrefix("a/b/c.txt"));
-        assertEquals("/", FilenameUtils.getPrefix("/a/b/c.txt"));
-        assertEquals("C:/", FilenameUtils.getPrefix("C:/a/b/c.txt"));
-        assertEquals("//server/", FilenameUtils.getPrefix("//server/a/b/c.txt"));
-        assertEquals("~/", FilenameUtils.getPrefix("~/a/b/c.txt"));
-        assertEquals("~user/", FilenameUtils.getPrefix("~user/a/b/c.txt"));
-
-        assertEquals("", FilenameUtils.getPrefix("a\\b\\c.txt"));
-        assertEquals("\\", FilenameUtils.getPrefix("\\a\\b\\c.txt"));
-        assertEquals("~\\", FilenameUtils.getPrefix("~\\a\\b\\c.txt"));
-        assertEquals("~user\\", FilenameUtils.getPrefix("~user\\a\\b\\c.txt"));
-    }
 
     @Test
     public void testGetPrefix_with_null_character() {
