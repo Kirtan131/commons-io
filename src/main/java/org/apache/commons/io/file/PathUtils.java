@@ -1765,10 +1765,13 @@ public final class PathUtils {
      * @throws IOException if an I/O error is thrown when accessing the starting file.
      * @since 2.9.0
      */
-    public static Stream<Path> walk(final Path start, final PathFilter pathFilter, final int maxDepth, final boolean readAttributes,
-        final FileVisitOption... options) throws IOException {
+    public static Stream<Path> walk(Path start, PathFilter pathFilter, int maxDepth, boolean readAttributes,
+                                    FileVisitOption... options) throws IOException {
         return Files.walk(start, maxDepth, options)
-            .filter(path -> pathFilter.accept(path, readAttributes ? readBasicFileAttributesUnchecked(path) : null) == FileVisitResult.CONTINUE);
+                .filter(path -> {
+                    BasicFileAttributes attributes = readAttributes ? readBasicFileAttributesUnchecked(path) : null;
+                    return pathFilter.accept(path, attributes) == FileVisitResult.CONTINUE;
+                });
     }
 
     private static <R> R withPosixFileAttributes(final Path path, final LinkOption[] linkOptions, final boolean overrideReadOnly,
