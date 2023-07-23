@@ -633,34 +633,38 @@ public final class PathUtils {
      * @throws IOException if an I/O error is thrown by a visitor method.
      */
     public static boolean directoryAndFileContentEquals(final Path path1, final Path path2, final LinkOption[] linkOptions, final OpenOption[] openOptions,
-        final FileVisitOption[] fileVisitOption) throws IOException {
-        // First walk both file trees and gather normalized paths.
-        if (path1 == null && path2 == null) {
+                                                        final FileVisitOption[] fileVisitOption) throws IOException {
+        // Return true if both paths are null or don't exist
+        if ((path1 == null && path2 == null) || (!Files.exists(path1) && !Files.exists(path2))) {
             return true;
         }
-        if (path1 == null || path2 == null) {
+        // Return false if only one path is null or doesn't exist
+        if (path1 == null || path2 == null || !Files.exists(path1) || !Files.exists(path2)) {
             return false;
         }
-        if (notExists(path1) && notExists(path2)) {
-            return true;
-        }
+
         final RelativeSortedPaths relativeSortedPaths = new RelativeSortedPaths(path1, path2, Integer.MAX_VALUE, linkOptions, fileVisitOption);
         // If the normalized path names and counts are not the same, no need to compare contents.
         if (!relativeSortedPaths.equals) {
             return false;
         }
+
         // Both visitors contain the same normalized paths, we can compare file contents.
         final List<Path> fileList1 = relativeSortedPaths.relativeFileList1;
         final List<Path> fileList2 = relativeSortedPaths.relativeFileList2;
+
+        // Compare the contents of all files in the lists
         for (final Path path : fileList1) {
             final int binarySearch = Collections.binarySearch(fileList2, path);
             if (binarySearch <= -1) {
-                throw new IllegalStateException("Unexpected mismatch.");
+                return false; // Found a mismatch in the relative file lists
             }
             if (!fileContentEquals(path1.resolve(path), path2.resolve(path), linkOptions, openOptions)) {
-                return false;
+                return false; // Found a mismatch in file contents
             }
         }
+
+        // All comparisons passed, directories and file contents are equal
         return true;
     }
 
